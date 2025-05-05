@@ -1,21 +1,20 @@
 resource "aws_lambda_function" "lambda" {
-  filename         = var.config.filename
-  function_name    = var.config.function_name
-  role             = aws_iam_role.lambda_role.arn
-  handler          = var.config.handler
-  source_code_hash = filebase64sha256(var.config.filename)
-  runtime          = var.config.runtime
-  memory_size      = var.config.memory_size
-  timeout          = var.config.timeout
-  publish          = var.config.publish
-  tags             = var.config.tags
-  layers           = var.config.layers
-  architectures    = [var.config.architecture]
+  filename      = var.main_config.filename
+  function_name = var.main_config.function_name
+  role          = aws_iam_role.lambda_role.arn
+  handler       = var.main_config.handler
+  runtime       = var.main_config.runtime
+  memory_size   = var.main_config.memory_size
+  timeout       = var.main_config.timeout
+  publish       = var.main_config.publish
+  tags          = var.main_config.tags
+  layers        = var.main_config.layers
+  architectures = [var.main_config.architecture]
 
   dynamic "environment" {
-    for_each = var.config.environment_variables != null ? [1] : []
+    for_each = var.main_config.environment_variables != null ? [1] : []
     content {
-      variables = merge(var.config.environment_variables, {})
+      variables = merge(var.main_config.environment_variables, {})
     }
   }
 
