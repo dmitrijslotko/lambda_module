@@ -44,3 +44,7 @@ data "archive_file" "lambda_source" {
   output_path = "${path.module}/.build/${var.main_config.function_name}.zip"
   depends_on  = [null_resource.build_lambda]
 }
+
+output "lambda" {
+  value = aws_lambda_function.lambda
+}

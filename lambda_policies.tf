@@ -23,3 +23,7 @@ resource "aws_iam_role_policy" "cloudwatch_logs_policy" {
       }]
   })
 }
+
+output "cloudwatch_logs_policy" {
+  value = aws_iam_role_policy.cloudwatch_logs_policy
+}
