@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "lambda" {
-  filename      = var.main_config.filename
+  filename      = data.archive_file.lambda_source.output_path
   function_name = var.main_config.function_name
   role          = aws_iam_role.lambda_role.arn
   handler       = var.main_config.handler
@@ -25,4 +25,22 @@ resource "aws_lambda_function" "lambda" {
       security_group_ids = var.vpc_config.security_group_ids
     }
   }
+}
+
+resource "null_resource" "build_lambda" {
+  # Triggers re-execution of local-exec when source code hash changes
+  triggers = {
+    trigger = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "make -C ${var.main_config.filename} lambda GOARCH=${var.main_config.architecture}"
+  }
+}
+
+data "archive_file" "lambda_source" {
+  type        = "zip"
+  source_dir  = "${var.main_config.filename}/.build"
+  output_path = "${path.module}/.build/${var.main_config.function_name}.zip"
+  depends_on  = [null_resource.build_lambda]
 }
