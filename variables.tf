@@ -15,12 +15,12 @@ variable "main_config" {
   })
 
   validation {
-    condition     = length(var.config.function_name) <= 64
+    condition     = length(var.main_config.function_name) <= 64
     error_message = "The name of the Lambda function, up to 64 characters in length."
   }
 
   validation {
-    condition     = var.config.memory_size >= 128 && var.config.memory_size <= 10240
+    condition     = var.main_config.memory_size >= 128 && var.main_config.memory_size <= 10240
     error_message = "Memory size should be between 128 and 10240."
   }
 }
