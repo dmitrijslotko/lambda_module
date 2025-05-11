@@ -24,6 +24,14 @@ variable "main_config" {
     error_message = "Memory size should be between 128 and 10240."
   }
 }
+
+variable "http_event_trigger" {
+  type = object({
+    url       = string
+    qualifier = optional(string, null)
+  })
+  default = null
+}
 variable "log_group_config" {
   type = object({
     retention_in_days = number

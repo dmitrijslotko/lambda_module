@@ -1,15 +1,16 @@
 resource "aws_lambda_function" "lambda" {
-  filename      = data.archive_file.lambda_source.output_path
-  function_name = var.main_config.function_name
-  role          = aws_iam_role.lambda_role.arn
-  handler       = var.main_config.handler
-  runtime       = var.main_config.runtime
-  memory_size   = var.main_config.memory_size
-  timeout       = var.main_config.timeout
-  publish       = var.main_config.publish
-  tags          = var.main_config.tags
-  layers        = var.main_config.layers
-  architectures = [var.main_config.architecture]
+  filename         = data.archive_file.lambda_source.output_path
+  function_name    = var.main_config.function_name
+  role             = aws_iam_role.lambda_role.arn
+  handler          = var.main_config.handler
+  runtime          = var.main_config.runtime
+  memory_size      = var.main_config.memory_size
+  timeout          = var.main_config.timeout
+  publish          = var.main_config.publish
+  tags             = var.main_config.tags
+  layers           = var.main_config.layers
+  architectures    = [var.main_config.architecture]
+  source_code_hash = data.archive_file.lambda_source.output_base64sha256
 
   dynamic "environment" {
     for_each = var.main_config.environment_variables != null ? [1] : []
@@ -27,7 +28,7 @@ resource "aws_lambda_function" "lambda" {
   }
 }
 
-resource "null_resource" "build_lambda" {
+resource "null_resource" "run_make_file" {
   # Triggers re-execution of local-exec when source code hash changes
   triggers = {
     trigger = timestamp()
@@ -42,7 +43,7 @@ data "archive_file" "lambda_source" {
   type        = "zip"
   source_dir  = "${var.main_config.filename}/.build"
   output_path = "${path.module}/.build/${var.main_config.function_name}.zip"
-  depends_on  = [null_resource.build_lambda]
+  depends_on  = [null_resource.run_make_file]
 }
 
 output "lambda" {
